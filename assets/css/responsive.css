@@ -14,6 +14,11 @@
     .hero {
         padding: 150px 0 80px;
     }
+
+    .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+        perspective: none;
+    }
 }
 
 /* Mobile (768px and below) */
@@ -99,5 +104,25 @@
 
     section {
         padding: 60px 0;
+    }
+
+    /* Services — disable 3D on mobile */
+    .service-card {
+        transform: none !important;
+        transform-style: flat;
+        will-change: auto;
+    }
+
+    .service-icon-wrap,
+    .card-body {
+        transform: none !important;
+    }
+
+    .card-arrow {
+        display: none;
+    }
+
+    .services-grid {
+        gap: 1.25rem;
     }
 }
