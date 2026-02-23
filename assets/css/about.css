@@ -1,0 +1,23 @@
+/* --- About --- */
+.about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+    align-items: center;
+}
+
+.about-images img {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+
+.about-text h2 {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-md);
+}
+
+.about-text p {
+    color: var(--color-muted);
+    font-size: 1.125rem;
+    margin-bottom: var(--space-md);
+}

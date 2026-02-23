@@ -27,6 +27,10 @@
     transition-delay: 300ms;
 }
 
+.delay-400 {
+    transition-delay: 400ms;
+}
+
 /* Micro-interactions */
 @media (hover: hover) {
     .nav-link::after {

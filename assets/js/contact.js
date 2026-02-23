@@ -2,22 +2,41 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyxUDqyPdT0PQ6NZyamFqIlEolaSqNRAtYFb-RkcGXfc3gKBrqOGCOvdnSKbFNxcAFq/exec";
 
-    // Poll until components are loaded into the DOM
+    // Poll until the contact form is loaded into the DOM
     const interval = setInterval(() => {
 
         const form = document.getElementById("contactForm");
-        const modal = document.getElementById("successModal");
-        if (!form || !modal) return;
+        if (!form) return;
 
         clearInterval(interval);
         console.log("Contact form initialized");
+
+        // --- Create Success Modal and append directly to <body> ---
+        // (Avoids any overflow/stacking-context clipping from parent containers)
+        const modal = document.createElement("div");
+        modal.id = "successModal";
+        modal.className = "modal-overlay";
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <h3>Thank You!</h3>
+                <p>Thank you for contacting us. We have received your message and will get back to you shortly.</p>
+                <button class="btn-red btn-sm" id="closeModal">Close</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
 
         // --- Close Modal Logic ---
         function closeModal() {
             modal.classList.remove("active");
         }
 
-        const closeBtn = document.getElementById("closeModal");
+        const closeBtn = modal.querySelector("#closeModal");
         if (closeBtn) {
             closeBtn.addEventListener("click", closeModal);
         }
@@ -38,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log("FORM SUBMITTED");
 
             const btn = form.querySelector("button[type='submit']");
-            const originalText = btn.innerHTML;
+            const originalHTML = btn.innerHTML;
 
             btn.innerHTML = "Sending...";
             btn.disabled = true;
@@ -65,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error("Error:", error);
                 alert("Submission failed. Please try again.");
             } finally {
-                btn.innerHTML = originalText;
+                btn.innerHTML = originalHTML;
                 btn.disabled = false;
             }
         });
