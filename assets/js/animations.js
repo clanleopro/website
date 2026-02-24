@@ -18,3 +18,12 @@ window.initAnimations = function () {
     const hiddenElements = document.querySelectorAll('.fade-on-scroll:not(.is-visible)');
     hiddenElements.forEach((el) => observer.observe(el));
 };
+
+// Re-run animations after a short delay to catch dynamically loaded content
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        if (window.initAnimations) {
+            window.initAnimations();
+        }
+    }, 100);
+});

@@ -1,0 +1,59 @@
+/* Terms of Service Styles */
+
+.terms-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 150px 20px 100px;
+}
+
+.terms-container h1 {
+    margin-bottom: var(--space-md);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.terms-container > p {
+    margin-bottom: var(--space-md);
+    color: var(--color-muted);
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+.terms-container section {
+    padding: var(--space-md) 0;
+}
+
+.terms-container section h3 {
+    margin-bottom: var(--space-sm);
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.terms-container section div {
+    color: var(--color-muted);
+    line-height: 1.8;
+    font-size: 0.95rem;
+}
+
+.terms-container section p {
+    margin-bottom: 10px;
+}
+
+.terms-container section p:last-child {
+    margin-bottom: 0;
+}
+
+.terms-container section strong {
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.terms-back-link {
+    margin-top: var(--space-lg);
+}
+
+.terms-back-link a {
+    display: inline-block;
+}
