@@ -18,6 +18,14 @@ document.addEventListener("DOMContentLoaded", function () {
         if (window.initAnimations) {
             window.initAnimations();
         }
+        
+        // Re-initialize again after a short delay to catch any late-loaded elements
+        setTimeout(() => {
+            if (window.initAnimations) {
+                window.initAnimations();
+            }
+        }, 200);
+        
         // Re-check hash navigation since content might have shifted
         if (window.location.hash) {
             const hash = window.location.hash;

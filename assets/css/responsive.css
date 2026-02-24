@@ -17,6 +17,7 @@
 
     .services-grid {
         grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: auto;
         perspective: none;
         gap: 1.5rem;
     }
@@ -124,6 +125,8 @@
     }
 
     .services-grid {
+        grid-template-columns: 1fr;
+        grid-auto-rows: auto;
         gap: 1.25rem;
     }
 }
