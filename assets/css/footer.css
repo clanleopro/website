@@ -18,6 +18,12 @@ footer {
     opacity: 0.9;
 }
 
+.footer-contact h4 {
+    color: var(--color-white);
+    margin-bottom: var(--space-md);
+    font-size: 1.125rem;
+}
+
 .social-icons {
     display: flex;
     gap: var(--space-sm);
