@@ -30,6 +30,15 @@
 
     /* Header Height */
     --header-height: 80px;
+
+    /* ===== Responsive Typography Scale ===== */
+    --text-xs: clamp(0.75rem, 0.8vw, 0.85rem);
+    --text-sm: clamp(0.85rem, 1vw, 0.95rem);
+    --text-base: clamp(0.95rem, 1.2vw, 1.05rem);
+    --text-lg: clamp(1.1rem, 1.5vw, 1.25rem);
+    --text-xl: clamp(1.5rem, 3vw, 2rem);
+    --text-2xl: clamp(2rem, 5vw, 3rem);
+    --text-3xl: clamp(2.5rem, 6vw, 3.5rem);
 }
 
 html {
