@@ -85,4 +85,6 @@
 
 .privacy-back-link a {
     display: inline-block;
+    color: #ffffff;
+    text-decoration: none;
 }

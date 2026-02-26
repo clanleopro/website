@@ -1,3 +1,10 @@
+fetch("components/navbar.html")
+  .then(response => response.text())
+  .then(data => {
+    document.getElementById("navbar").innerHTML = data;
+    initNavbar();
+  });
+  
 function initNavbar() {
     const header = document.querySelector('.main-header');
     const hamburger = document.querySelector('.hamburger');
