@@ -38,12 +38,15 @@ footer {
     border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.1);
     transition: all 0.2s ease;
+    overflow: hidden;
 }
 
 .social-circle img {
     width: 20px;
     height: 20px;
+    display: block;
     filter: invert(1);
+    margin-bottom: 0;
 }
 
 .social-circle:hover {
