@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Broadcast</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    :root {
+      --bg-color: #f3f2ef;
+      --card-bg: #ffffff;
+      --text-primary: rgba(0, 0, 0, 0.9);
+      --text-secondary: rgba(0, 0, 0, 0.6);
+      --border-color: rgba(0, 0, 0, 0.08);
+      --primary-blue: #0a66c2;
+      --action-color: rgba(0, 0, 0, 0.65);
+      --action-hover-bg: rgba(0, 0, 0, 0.06);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+      --font-family: "Inter", sans-serif;
+      --sidebar-width: 420px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      font-family: var(--font-family);
+      color: var(--text-primary);
+      overflow-x: hidden;
+    }
+
+    .page-shell {
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 20px 20px 40px;
+      transition: margin-right 0.28s ease;
+    }
+
+    .top-bar {
+      width: 100%;
+      padding: 16px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .store-buttons {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .store-btn {
+      height: 40px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      display: block;
+    }
+
+    .store-buttons a {
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    .store-btn:hover {
+      transform: scale(1.04);
+    }
+
+    .status-banner {
+      display: none;
+      margin: 0 8px 16px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      border: 1px solid transparent;
+    }
+
+    .status-banner.show {
+      display: block;
+    }
+
+    .status-banner.error {
+      background: #fff2f2;
+      color: #8a1c1c;
+      border-color: #f3c3c3;
+    }
+
+    .status-banner.info {
+      background: #eef6ff;
+      color: #0a4b8f;
+      border-color: #c8dfff;
+    }
+
+    .post-card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    }
+
+    .post-header {
+      display: flex;
+      padding: 16px;
+      align-items: flex-start;
+    }
+
+    .profile-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      margin-right: 12px;
+      object-fit: cover;
+      background: #e8e8e8;
+      flex-shrink: 0;
+    }
+
+    .header-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .username {
+      font-weight: 600;
+      font-size: 15px;
+      word-break: break-word;
+    }
+
+    .time-ago {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .post-content {
+      padding: 0 16px 12px;
+    }
+
+    .post-text {
+      font-size: 14px;
+      line-height: 1.6;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+
+    .post-heading {
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .media-stack {
+      padding: 0 16px 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .post-media {
+      width: 100%;
+      border-radius: 10px;
+      background: #f6f6f6;
+      display: block;
+      max-height: 520px;
+      object-fit: cover;
+    }
+
+    video.post-media {
+      background: #000;
+    }
+
+    .carousel {
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+      width: 100%;
+      background: #f6f6f6;
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.4s ease;
+      width: 100%;
+    }
+
+    .carousel-item {
+      min-width: 100%;
+      width: 100%;
+      height: 420px;
+      object-fit: cover;
+      border-radius: 10px;
+      background: #f6f6f6;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      font-size: 18px;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 50%;
+      z-index: 10;
+    }
+
+    .nav.left {
+      left: 10px;
+    }
+
+    .nav.right {
+      right: 10px;
+    }
+
+    .dots {
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      z-index: 10;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      margin: 0 4px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .dot.active {
+      background: white;
+    }
+
+    .action-bar {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid var(--border-color);
+      gap: 4px;
+    }
+
+    .action-btn {
+      flex: 1;
+      border: none;
+      background: none;
+      cursor: pointer;
+      padding: 10px 8px;
+      color: var(--action-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      border-radius: 10px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: var(--action-hover-bg);
+    }
+
+    .action-btn:focus-visible {
+      outline: 2px solid var(--primary-blue);
+      outline-offset: 2px;
+    }
+
+    .action-btn.active {
+      color: var(--primary-blue);
+      background: rgba(10, 102, 194, 0.08);
+    }
+
+    .action-count {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .action-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.28s ease, visibility 0.28s ease;
+      z-index: 1000;
+    }
+
+    .sidebar-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .comments-sidebar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(var(--sidebar-width), 100vw);
+      height: 100vh;
+      background: #fff;
+      box-shadow: var(--shadow);
+      transform: translateX(100%);
+      transition: transform 0.28s ease;
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .comments-sidebar.open {
+      transform: translateX(0);
+    }
+
+    .sidebar-header {
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sidebar-title-wrap {
+      min-width: 0;
+    }
+
+    .sidebar-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .sidebar-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .sidebar-close {
+      border: none;
+      background: transparent;
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-close:hover {
+      background: var(--action-hover-bg);
+    }
+
+    .sidebar-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px 20px;
+      background: #fafafa;
+    }
+
+    .comment-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .comment-card {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .comment-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .comment-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #ececec;
+      flex-shrink: 0;
+    }
+
+    .comment-meta {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .comment-author {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      word-break: break-word;
+    }
+
+    .comment-time {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .comment-text {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-primary);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .empty-state,
+    .loading-state {
+      background: #fff;
+      border: 1px dashed var(--border-color);
+      border-radius: 14px;
+      padding: 24px 18px;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* FULL PAGE PLACEHOLDER */
+    .full-page-placeholder {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #fff;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .full-page-placeholder.show {
+      display: flex;
+    }
+
+    .full-page-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 16px;
+      }
+
+      .top-bar {
+        align-items: flex-start;
+      }
+
+      .carousel-item {
+        height: 320px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .action-label {
+        display: none;
+      }
+
+      .logo {
+        font-size: 22px;
+      }
+
+      .carousel-item {
+        height: 240px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- FULL SCREEN PLACEHOLDER -->
+  <div id="full-page-placeholder" class="full-page-placeholder">
+   <img src="/assets/images/placeholder.png" alt="Placeholder" />
+  </div>
+
+  <div class="page-shell" id="page-shell">
+    <div class="container">
+      <div class="top-bar">
+        <h1 class="logo">Broadcast</h1>
+
+        <div class="store-buttons">
+          <a href="https://apps.apple.com/in/app/leo-rigging-calculator/id6744311128" target="_blank"
+            rel="noopener noreferrer" aria-label="Open App Store">
+            <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
+              class="store-btn" alt="Download on the App Store" />
+          </a>
+
+          <a href="https://play.google.com/store/apps/details?id=com.org.leoRiggingCalculator" target="_blank"
+            rel="noopener noreferrer" aria-label="Open Play Store">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+              class="store-btn" alt="Get it on Google Play" />
+          </a>
+        </div>
+      </div>
+
+      <div id="status-banner" class="status-banner info">Loading broadcast...</div>
+
+      <article class="post-card">
+        <div class="post-header">
+          <img src="https://ui-avatars.com/api/?name=Broadcast+User" class="profile-img" id="profile-img"
+            alt="Profile" />
+
+          <div class="header-content">
+            <div class="username" id="username">Loading...</div>
+            <div class="time-ago" id="time-ago">Please wait</div>
+          </div>
+        </div>
+
+        <div class="post-content">
+          <div class="post-text" id="post-text">Loading post content...</div>
+        </div>
+
+        <div class="media-stack" id="media-container"></div>
+
+        <div class="action-bar">
+          <button class="action-btn" type="button" id="react-btn" aria-label="React">
+            <span class="action-count" id="likes-count">0</span>
+            <i class="fa-regular fa-thumbs-up" aria-hidden="true"></i>
+            <span class="action-label">React</span>
+          </button>
+
+          <button class="action-btn" type="button" id="comment-btn" aria-label="Open comments"
+            aria-controls="comments-sidebar" aria-expanded="false">
+            <span class="action-count" id="comments-count">0</span>
+            <i class="fa-regular fa-comment" aria-hidden="true"></i>
+            <span class="action-label">Comment</span>
+          </button>
+
+          <button class="action-btn" type="button" id="share-btn" aria-label="Share">
+            <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
+            <span class="action-label">Share</span>
+          </button>
+        </div>
+      </article>
+    </div>
+
+    <div id="sidebar-overlay" class="sidebar-overlay" aria-hidden="true"></div>
+
+    <aside id="comments-sidebar" class="comments-sidebar" aria-labelledby="comments-title" aria-hidden="true">
+      <div class="sidebar-header">
+        <div class="sidebar-title-wrap">
+          <div class="sidebar-title" id="comments-title">Comments</div>
+          <div class="sidebar-subtitle" id="comments-subtitle">0 comments</div>
+        </div>
+
+        <button class="sidebar-close" type="button" id="close-sidebar" aria-label="Close comments">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-body">
+        <div id="comments-content" class="loading-state">Loading comments...</div>
+      </div>
+    </aside>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+
+  <script>
+    const ENCRYPTED_KEY = "R1I6S8H1A0D0A1P8I7J5K4L7M3N4O5P6";
+    const ENCRYPTED_IV = "7832541597RSHBJS";
+
+    const params = new URLSearchParams(window.location.search);
+    const rawBid = params.get("bid");
+
+    function isUuid(value) {
+      return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test((value || "").trim());
+    }
+
+    function normalizeEncryptedBid(value) {
+      if (!value) return "";
+      return value.trim().replace(/ /g, "+");
+    }
+
+    function decryptBid(encryptedBid) {
+      try {
+        if (!encryptedBid) return null;
+
+        const cleanedBid = normalizeEncryptedBid(encryptedBid);
+
+        if (isUuid(cleanedBid)) {
+          return cleanedBid;
+        }
+
+        if (typeof CryptoJS === "undefined") {
+          throw new Error("CryptoJS library not loaded");
+        }
+
+        const key = CryptoJS.enc.Utf8.parse(ENCRYPTED_KEY);
+        const iv = CryptoJS.enc.Utf8.parse(ENCRYPTED_IV);
+        const cipherParams = CryptoJS.lib.CipherParams.create({
+          ciphertext: CryptoJS.enc.Base64.parse(cleanedBid),
+        });
+
+        const decrypted = CryptoJS.AES.decrypt(cipherParams, key, {
+          iv: iv,
+          mode: CryptoJS.mode.CBC,
+          padding: CryptoJS.pad.Pkcs7,
+        });
+
+        const decryptedText = decrypted.toString(CryptoJS.enc.Utf8).trim();
+
+        console.log("Raw bid from URL:", encryptedBid);
+        console.log("Normalized encrypted bid:", cleanedBid);
+        console.log("Decrypted bid:", decryptedText);
+
+        if (!decryptedText) {
+          throw new Error("Decryption returned empty value");
+        }
+
+        return decryptedText;
+      } catch (error) {
+        console.error("Failed to decrypt bid:", error);
+        return null;
+      }
+    }
+
+    const bid = rawBid ? decryptBid(rawBid) : null;
+
+    const API_BASE = "http://192.168.29.80:3000/api/v2/broadcast";
+    const API_URL = bid ? `${API_BASE}/${encodeURIComponent(bid)}` : null;
+
+    console.log("Final API URL:", API_URL);
+
+    const state = {
+      post: null,
+      comments: [],
+      isSidebarOpen: false,
+      isLoading: false,
+      hasLoaded: false,
+    };
+
+    const dom = {
+      pageShell: document.getElementById("page-shell"),
+      fullPagePlaceholder: document.getElementById("full-page-placeholder"),
+      statusBanner: document.getElementById("status-banner"),
+      profileImg: document.getElementById("profile-img"),
+      username: document.getElementById("username"),
+      timeAgo: document.getElementById("time-ago"),
+      postText: document.getElementById("post-text"),
+      mediaContainer: document.getElementById("media-container"),
+      likesCount: document.getElementById("likes-count"),
+      commentsCount: document.getElementById("comments-count"),
+      commentBtn: document.getElementById("comment-btn"),
+      sidebar: document.getElementById("comments-sidebar"),
+      sidebarOverlay: document.getElementById("sidebar-overlay"),
+      closeSidebarBtn: document.getElementById("close-sidebar"),
+      commentsContent: document.getElementById("comments-content"),
+      commentsSubtitle: document.getElementById("comments-subtitle"),
+      shareBtn: document.getElementById("share-btn"),
+    };
+
+    function showFullPagePlaceholder() {
+      dom.pageShell.style.display = "none";
+      dom.fullPagePlaceholder.classList.add("show");
+      document.body.style.margin = "0";
+      document.body.style.padding = "0";
+      document.body.style.background = "#fff";
+    }
+
+    function showStatus(message, type = "info") {
+      dom.statusBanner.textContent = message;
+      dom.statusBanner.className = `status-banner show ${type}`;
+    }
+
+    function hideStatus() {
+      dom.statusBanner.className = "status-banner";
+      dom.statusBanner.textContent = "";
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function formatDisplayDate(input) {
+      if (!input) return "Unknown date";
+
+      const date = new Date(input);
+      if (Number.isNaN(date.getTime())) return "Unknown date";
+
+      return new Intl.DateTimeFormat("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      }).format(date);
+    }
+
+    function getAvatar(name, photoUrl) {
+      if (photoUrl && typeof photoUrl === "string") return photoUrl;
+      const safeName = encodeURIComponent(name || "User");
+      return `https://ui-avatars.com/api/?name=${safeName}&background=random`;
+    }
+
+    function normalizeUser(user) {
+      if (!user || typeof user !== "object") {
+        return {
+          userName: "Unknown User",
+          profilePhoto: "",
+        };
+      }
+
+      const accountType = (user.accountType || "").toUpperCase();
+
+      let displayName = "Unknown User";
+
+      if (accountType === "INDIVIDUAL") {
+        displayName =
+          user.userName ||
+          user.username ||
+          user.name ||
+          "Unknown User";
+      } else if (accountType === "COMPANY") {
+        displayName =
+          user.companyName ||
+          user.name ||
+          "Unknown Company";
+      } else {
+        displayName =
+          user.userName ||
+          user.companyName ||
+          user.username ||
+          user.name ||
+          "Unknown User";
+      }
+
+      return {
+        userName: displayName,
+        profilePhoto: user.profilePhoto || user.photo || user.avatar || "",
+      };
+    }
+
+    function normalizeMediaFiles(mediaFiles) {
+      if (!Array.isArray(mediaFiles)) return [];
+
+      return mediaFiles
+        .filter(Boolean)
+        .map((media) => ({
+          mediaType: String(media.mediaType || media.type || "").toUpperCase(),
+          mediaUrl: media.mediaUrl || media.url || "",
+        }))
+        .filter((item) => item.mediaUrl);
+    }
+
+    function normalizeComments(comments) {
+      if (!Array.isArray(comments)) return [];
+
+      return comments
+        .filter(Boolean)
+        .map((comment, index) => {
+          const user = normalizeUser(comment.user || comment.createdBy || comment.author);
+
+          return {
+            id: comment.commentId || comment.id || `comment-${index}`,
+            text: comment.comment || comment.text || comment.message || "",
+            createdAt: comment.createdAt || comment.updatedAt || null,
+            user,
+          };
+        });
+    }
+
+    function normalizePost(rawPost) {
+      if (!rawPost || typeof rawPost !== "object") {
+        throw new Error("Invalid post payload");
+      }
+
+      return {
+        id: rawPost.postId || rawPost.id || "",
+        heading: rawPost.heading || "",
+        caption: rawPost.caption || "",
+        createdAt: rawPost.createdAt || null,
+        views: Number(rawPost.views || rawPost.likes || 0),
+        user: normalizeUser(rawPost.user),
+        mediaFiles: normalizeMediaFiles(rawPost.mediaFiles),
+        comments: normalizeComments(rawPost.comments),
+      };
+    }
+
+    function renderPost(post) {
+      dom.profileImg.src = getAvatar(post.user.userName, post.user.profilePhoto);
+      dom.profileImg.alt = `${post.user.userName} profile image`;
+      dom.username.textContent = post.user.userName;
+      dom.timeAgo.textContent = `${formatDisplayDate(post.createdAt)} • 🌍`;
+
+      const headingHtml = post.heading
+        ? `<span class="post-heading">${escapeHtml(post.heading)}</span>`
+        : "";
+
+      const captionHtml = post.caption ? escapeHtml(post.caption) : "";
+
+      dom.postText.innerHTML = `${headingHtml}${captionHtml}`;
+
+      renderMedia(post.mediaFiles);
+
+      dom.likesCount.textContent = String(post.views || 0);
+      dom.commentsCount.textContent = String(post.comments.length);
+      dom.commentsSubtitle.textContent =
+        `${post.comments.length} comment${post.comments.length === 1 ? "" : "s"}`;
+    }
+
+    function initCarousel(carouselElement) {
+      if (!carouselElement) return;
+
+      const track = carouselElement.querySelector(".carousel-track");
+      const items = carouselElement.querySelectorAll(".carousel-item");
+      const dots = carouselElement.querySelectorAll(".dot");
+      const prevBtn = carouselElement.querySelector(".nav.left");
+      const nextBtn = carouselElement.querySelector(".nav.right");
+
+      if (!track || !items.length) return;
+
+      let index = 0;
+
+      function updateCarousel() {
+        track.style.transform = `translateX(-${index * 100}%)`;
+
+        dots.forEach((dot, i) => {
+          dot.classList.toggle("active", i === index);
+        });
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+          index = (index + 1) % items.length;
+          updateCarousel();
+        });
+      }
+
+      if (prevBtn) {
+        prevBtn.addEventListener("click", () => {
+          index = (index - 1 + items.length) % items.length;
+          updateCarousel();
+        });
+      }
+
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          index = Number(dot.dataset.index || 0);
+          updateCarousel();
+        });
+      });
+
+      updateCarousel();
+    }
+
+    function renderMedia(mediaFiles) {
+      dom.mediaContainer.innerHTML = "";
+
+      if (!mediaFiles.length) {
+        dom.mediaContainer.classList.add("hidden");
+        return;
+      }
+
+      dom.mediaContainer.classList.remove("hidden");
+
+      if (mediaFiles.length === 1) {
+        const media = mediaFiles[0];
+
+        if (media.mediaType === "VIDEO") {
+          dom.mediaContainer.innerHTML = `
+            <video class="post-media" controls playsinline>
+              <source src="${escapeHtml(media.mediaUrl)}" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          `;
+        } else {
+          dom.mediaContainer.innerHTML = `
+            <img class="post-media" src="${escapeHtml(media.mediaUrl)}" alt="Broadcast media" />
+          `;
+        }
+
+        return;
+      }
+
+      dom.mediaContainer.innerHTML = `
+        <div class="carousel">
+          <div class="carousel-track">
+            ${mediaFiles.map((media) => {
+              if (media.mediaType === "VIDEO") {
+                return `
+                  <video class="carousel-item" controls playsinline>
+                    <source src="${escapeHtml(media.mediaUrl)}" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                `;
+              }
+
+              return `
+                <img
+                  class="carousel-item"
+                  src="${escapeHtml(media.mediaUrl)}"
+                  alt="Broadcast media"
+                />
+              `;
+            }).join("")}
+          </div>
+
+          <button class="nav left" type="button" aria-label="Previous media">&#10094;</button>
+          <button class="nav right" type="button" aria-label="Next media">&#10095;</button>
+
+          <div class="dots">
+            ${mediaFiles.map((_, i) =>
+              `<span class="dot ${i === 0 ? "active" : ""}" data-index="${i}"></span>`
+            ).join("")}
+          </div>
+        </div>
+      `;
+
+      const carouselElement = dom.mediaContainer.querySelector(".carousel");
+      initCarousel(carouselElement);
+    }
+
+    function renderComments() {
+      const comments = state.comments;
+      dom.commentsSubtitle.textContent =
+        `${comments.length} comment${comments.length === 1 ? "" : "s"}`;
+
+      if (!comments.length) {
+        dom.commentsContent.className = "empty-state";
+        dom.commentsContent.textContent = "No comments yet.";
+        return;
+      }
+
+      const list = document.createElement("div");
+      list.className = "comment-list";
+
+      comments.forEach((comment) => {
+        const card = document.createElement("div");
+        card.className = "comment-card";
+
+        const avatar = getAvatar(comment.user.userName, comment.user.profilePhoto);
+
+        card.innerHTML = `
+          <div class="comment-header">
+            <img
+              class="comment-avatar"
+              src="${escapeHtml(avatar)}"
+              alt="${escapeHtml(comment.user.userName)} avatar"
+            />
+            <div class="comment-meta">
+              <div class="comment-author">${escapeHtml(comment.user.userName)}</div>
+              <div class="comment-time">${escapeHtml(formatDisplayDate(comment.createdAt))}</div>
+            </div>
+          </div>
+          <div class="comment-text">${escapeHtml(comment.text || "No comment text")}</div>
+        `;
+
+        list.appendChild(card);
+      });
+
+      dom.commentsContent.className = "";
+      dom.commentsContent.innerHTML = "";
+      dom.commentsContent.appendChild(list);
+    }
+
+    function openCommentsSidebar() {
+      state.isSidebarOpen = true;
+      dom.sidebar.classList.add("open");
+      dom.sidebarOverlay.classList.add("show");
+      dom.commentBtn.classList.add("active");
+      dom.commentBtn.setAttribute("aria-expanded", "true");
+      dom.sidebar.setAttribute("aria-hidden", "false");
+      dom.sidebarOverlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      renderComments();
+    }
+
+    function closeCommentsSidebar() {
+      state.isSidebarOpen = false;
+      dom.sidebar.classList.remove("open");
+      dom.sidebarOverlay.classList.remove("show");
+      dom.commentBtn.classList.remove("active");
+      dom.commentBtn.setAttribute("aria-expanded", "false");
+      dom.sidebar.setAttribute("aria-hidden", "true");
+      dom.sidebarOverlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    async function fetchBroadcast() {
+      if (!rawBid) {
+        showFullPagePlaceholder();
+        return;
+      }
+
+      if (!bid || !API_URL) {
+        showStatus("Invalid or unreadable broadcast link.", "error");
+        dom.postText.textContent = "Unable to read this broadcast link.";
+        dom.username.textContent = "Unavailable";
+        dom.timeAgo.textContent = "Invalid bid";
+        dom.mediaContainer.classList.add("hidden");
+        dom.likesCount.textContent = "0";
+        dom.commentsCount.textContent = "0";
+        dom.commentsContent.className = "empty-state";
+        dom.commentsContent.textContent = "Comments are unavailable because the broadcast link could not be decrypted.";
+        return;
+      }
+
+      state.isLoading = true;
+      showStatus("Loading broadcast...", "info");
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const contentType = response.headers.get("content-type") || "";
+        if (!contentType.includes("application/json")) {
+          throw new Error("API did not return JSON");
+        }
+
+        const data = await response.json();
+
+        if (!data || data.success !== true || !data.post) {
+          throw new Error("Broadcast not found or invalid payload");
+        }
+
+        const post = normalizePost(data.post);
+
+        state.post = post;
+        state.comments = post.comments;
+        state.hasLoaded = true;
+
+        renderPost(post);
+        hideStatus();
+      } catch (error) {
+        console.error("Error fetching broadcast:", error);
+        showStatus(
+          "Failed to load broadcast. Please check the API, CORS, and response format.",
+          "error"
+        );
+
+        dom.postText.textContent = "Unable to load the broadcast right now.";
+        dom.username.textContent = "Unavailable";
+        dom.timeAgo.textContent = "Please try again";
+        dom.mediaContainer.classList.add("hidden");
+        dom.likesCount.textContent = "0";
+        dom.commentsCount.textContent = "0";
+        dom.commentsContent.className = "empty-state";
+        dom.commentsContent.textContent =
+          "Comments are unavailable because the broadcast failed to load.";
+      } finally {
+        state.isLoading = false;
+      }
+    }
+
+    async function shareBroadcast() {
+      try {
+        const sharePayload = {
+          title: state.post?.heading || "Broadcast",
+          text: state.post?.caption || "Check out this broadcast",
+          url: window.location.href,
+        };
+
+        if (navigator.share) {
+          await navigator.share(sharePayload);
+          return;
+        }
+
+        await navigator.clipboard.writeText(window.location.href);
+        alert("Broadcast link copied to clipboard.");
+      } catch (error) {
+        console.error("Share failed:", error);
+      }
+    }
+
+    function bindEvents() {
+      dom.commentBtn.addEventListener("click", () => {
+        if (!state.hasLoaded) return;
+        openCommentsSidebar();
+      });
+
+      dom.closeSidebarBtn.addEventListener("click", closeCommentsSidebar);
+      dom.sidebarOverlay.addEventListener("click", closeCommentsSidebar);
+
+      dom.shareBtn.addEventListener("click", () => {
+        shareBroadcast();
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && state.isSidebarOpen) {
+          closeCommentsSidebar();
+        }
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      bindEvents();
+      fetchBroadcast();
+    });
+  </script>
+
+</body>
+
+</html>
