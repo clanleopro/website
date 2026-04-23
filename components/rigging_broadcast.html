@@ -667,10 +667,10 @@
 
     const bid = rawBid ? decryptBid(rawBid) : null;
 
-    const API_BASE = "http://192.168.29.80:3000/api/v2/broadcast";
+    const API_BASE = "https://share.clanleo.com/api/v2/broadcast";
     const API_URL = bid ? `${API_BASE}/${encodeURIComponent(bid)}` : null;
 
-    console.log("Final API URL:", API_URL);
+   
 
     const state = {
       post: null,
