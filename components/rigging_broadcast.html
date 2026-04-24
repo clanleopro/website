@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Broadcast</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- FIXED PATH -->
+  <link rel="stylesheet" href="../assets/css/rigging_broadcast.css" />
+</head>
+
+<body>
+  <div id="full-page-placeholder" class="full-page-placeholder">
+    <img src="/assets/images/placeholder.png" alt="Placeholder" />
+  </div>
+
+  <div class="page-shell" id="page-shell">
+    <div class="container">
+      <div class="top-bar">
+        <h1 class="logo">Broadcast</h1>
+
+        <div class="store-buttons">
+          <a href="https://apps.apple.com/in/app/leo-rigging-calculator/id6744311128" target="_blank"
+            rel="noopener noreferrer" aria-label="Open App Store">
+            <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
+              class="store-btn" alt="Download on the App Store" />
+          </a>
+
+          <a href="https://play.google.com/store/apps/details?id=com.org.leoRiggingCalculator" target="_blank"
+            rel="noopener noreferrer" aria-label="Open Play Store">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+              class="store-btn" alt="Get it on Google Play" />
+          </a>
+        </div>
+      </div>
+
+      <div id="status-banner" class="status-banner info">Loading broadcast...</div>
+
+      <article class="post-card">
+        <div class="post-header">
+          <img
+            src="https://ui-avatars.com/api/?name=Broadcast+User"
+            class="profile-img"
+            id="profile-img"
+            alt="Profile"
+          />
+
+          <div class="header-content">
+            <div class="username" id="username">Loading...</div>
+            <div class="time-ago" id="time-ago">Please wait</div>
+          </div>
+        </div>
+
+        <div class="post-content">
+          <div class="post-text" id="post-text">Loading post content...</div>
+        </div>
+
+        <div class="media-stack" id="media-container"></div>
+
+        <div class="action-bar">
+          <button class="action-btn" type="button" id="react-btn" aria-label="React">
+            <span class="action-count" id="likes-count">0</span>
+            <i class="fa-regular fa-thumbs-up" aria-hidden="true"></i>
+            <span class="action-label">React</span>
+          </button>
+
+          <button
+            class="action-btn"
+            type="button"
+            id="comment-btn"
+            aria-label="Open comments"
+            aria-controls="comments-sidebar"
+            aria-expanded="false"
+          >
+            <span class="action-count" id="comments-count">0</span>
+            <i class="fa-regular fa-comment" aria-hidden="true"></i>
+            <span class="action-label">Comment</span>
+          </button>
+
+          <button class="action-btn" type="button" id="share-btn" aria-label="Share">
+            <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
+            <span class="action-label">Share</span>
+          </button>
+        </div>
+      </article>
+    </div>
+
+    <div id="sidebar-overlay" class="sidebar-overlay" aria-hidden="true"></div>
+
+    <aside
+      id="comments-sidebar"
+      class="comments-sidebar"
+      aria-labelledby="comments-title"
+      aria-hidden="true"
+    >
+      <div class="sidebar-header">
+        <div class="sidebar-title-wrap">
+          <div class="sidebar-title" id="comments-title">Comments</div>
+          <div class="sidebar-subtitle" id="comments-subtitle">0 comments</div>
+        </div>
+
+        <button class="sidebar-close" type="button" id="close-sidebar" aria-label="Close comments">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-body">
+        <div id="comments-content" class="loading-state">Loading comments...</div>
+      </div>
+    </aside>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+
+  <!-- FIXED PATH -->
+  <script src="../assets/js/rigging_broadcast.js"></script>
+</body>
+
+</html>
