@@ -493,10 +493,16 @@ async function fetchBroadcast() {
 
 async function shareBroadcast() {
   try {
+    const currentBid = rawBid || "";
+
+    const shareUrl = currentBid
+      ? `https://share.clanleo.com/broadcast/share?bid=${encodeURIComponent(currentBid)}`
+      : window.location.href;
+
     const sharePayload = {
-      title: state.post?.heading || "Broadcast",
+      title: state.post?.heading || "LEO Rigging Calculator Broadcast",
       text: state.post?.caption || "Check out this broadcast",
-      url: window.location.href,
+      url: shareUrl,
     };
 
     if (navigator.share) {
@@ -504,12 +510,32 @@ async function shareBroadcast() {
       return;
     }
 
-    await navigator.clipboard.writeText(window.location.href);
+    await navigator.clipboard.writeText(shareUrl);
     alert("Broadcast link copied to clipboard.");
   } catch (error) {
     console.error("Share failed:", error);
   }
 }
+
+// async function shareBroadcast() {
+//   try {
+//     const sharePayload = {
+//       title: state.post?.heading || "Broadcast",
+//       text: state.post?.caption || "Check out this broadcast",
+//       url: window.location.href,
+//     };
+
+//     if (navigator.share) {
+//       await navigator.share(sharePayload);
+//       return;
+//     }
+
+//     await navigator.clipboard.writeText(window.location.href);
+//     alert("Broadcast link copied to clipboard.");
+//   } catch (error) {
+//     console.error("Share failed:", error);
+//   }
+// }
 
 function bindEvents() {
   dom.commentBtn.addEventListener("click", () => {
