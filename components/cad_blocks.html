@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CAD Block</title>
+
+    <style>
+        :root {
+            --page-bg: #ffffff;
+            --header-bg: rgba(255, 255, 255, 0.96);
+            --card-bg: #f2f3f8;
+            --text-main: #2c2c31;
+            --text-muted: #686a76;
+            --danger: #d91610;
+            --danger-dark: #b90f0b;
+            --dot: #d9d9d9;
+            --border: #e2e4ec;
+            --radius: 6px;
+            --header-height: 122px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+        }
+
+        body {
+            font-family: Inter, Arial, Helvetica, sans-serif;
+            background: var(--page-bg);
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            height: var(--header-height);
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(226, 228, 236, 0.55);
+        }
+
+        .header-inner {
+            width: min(1060px, calc(100% - 40px));
+            height: 100%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 26px;
+        }
+
+        .header-inner h1 {
+            font-size: 31px;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+        }
+
+        .otp-btn {
+            border: 0;
+            outline: none;
+            cursor: pointer;
+            background: var(--danger);
+            color: #ffffff;
+            min-width: 142px;
+            height: 46px;
+            padding: 0 22px;
+            font-size: 14px;
+            font-weight: 800;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .otp-btn:hover {
+            background: var(--danger-dark);
+            transform: translateY(-1px);
+        }
+
+        .otp-btn.download-ready {
+            background: #141a26;
+            min-width: 178px;
+        }
+
+        .otp-btn.download-ready:hover {
+            background: #000000;
+        }
+
+        .otp-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.65;
+            transform: none;
+        }
+
+        .page {
+            width: min(1060px, calc(100% - 40px));
+            height: 100vh;
+            margin: 0 auto;
+            padding-top: calc(var(--header-height) + 34px);
+        }
+
+        .scroll-body {
+            height: calc(100vh - var(--header-height) - 34px);
+            overflow-y: auto;
+            padding-bottom: 70px;
+            scrollbar-width: thin;
+        }
+
+        .cad-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .cad-card {
+            min-height: 354px;
+            display: grid;
+            grid-template-columns: 316px 1fr;
+            gap: 38px;
+            align-items: center;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        .media-column {
+            width: 316px;
+        }
+
+        .image-wrap {
+            width: 316px;
+            height: 316px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 11px;
+            background: #e6e7ed;
+        }
+
+        .image-wrap .main-image {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 31px;
+            height: 31px;
+            border-radius: 50%;
+            border: 0;
+            background: rgba(255, 255, 255, 0.86);
+            color: var(--text-main);
+            cursor: pointer;
+            font-size: 27px;
+            line-height: 27px;
+            display: grid;
+            place-items: center;
+            opacity: 0;
+            transition: opacity 0.2s ease, background 0.2s ease;
+        }
+
+        .image-wrap:hover .nav-arrow {
+            opacity: 1;
+        }
+
+        .nav-arrow:hover {
+            background: #ffffff;
+        }
+
+        .prev {
+            left: 12px;
+        }
+
+        .next {
+            right: 12px;
+        }
+
+        .dots {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--dot);
+            display: inline-block;
+            border: 0;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .dot.active {
+            background: var(--danger);
+        }
+
+        .thumb-list {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+            scrollbar-width: thin;
+        }
+
+        .thumb {
+            width: 58px;
+            height: 46px;
+            flex: 0 0 58px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            background: #ffffff;
+            padding: 0;
+        }
+
+        .thumb img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .thumb.active {
+            border-color: var(--danger);
+        }
+
+        .card-content {
+            max-width: 500px;
+            transform: translateY(-3px);
+        }
+
+        .card-content h2 {
+            font-size: 19px;
+            line-height: 1.25;
+            font-weight: 800;
+            margin-bottom: 21px;
+            letter-spacing: -0.2px;
+        }
+
+        .card-content p {
+            font-size: 16px;
+            line-height: 1.43;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .price-text {
+            margin-top: 16px;
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--danger);
+        }
+
+        .meta-box {
+            margin-top: 16px;
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.65);
+            border: 1px solid rgba(226, 228, 236, 0.75);
+        }
+
+        .meta-row {
+            font-size: 13px;
+            line-height: 1.55;
+            color: var(--text-muted);
+            word-break: break-word;
+        }
+
+        .meta-row strong {
+            color: var(--text-main);
+        }
+
+        .loading-state,
+        .error-state,
+        .empty-state {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 28px;
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .error-state {
+            color: var(--danger);
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: rgba(21, 24, 32, 0.52);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+        .otp-modal {
+            width: min(430px, 100%);
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 24px 70px rgba(18, 22, 33, 0.22);
+            animation: modalIn 0.22s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: translateY(14px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .modal-head h3 {
+            font-size: 22px;
+            line-height: 1.2;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+        }
+
+        .modal-head p {
+            margin-top: 8px;
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        .modal-close {
+            width: 34px;
+            height: 34px;
+            border: 0;
+            border-radius: 50%;
+            cursor: pointer;
+            background: #f0f1f5;
+            color: var(--text-main);
+            font-size: 22px;
+            line-height: 1;
+        }
+
+        .otp-input {
+            width: 100%;
+            height: 52px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0 16px;
+            font-size: 20px;
+            letter-spacing: 8px;
+            font-weight: 700;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .otp-input:focus {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 4px rgba(217, 22, 16, 0.08);
+        }
+
+        .modal-error {
+            min-height: 20px;
+            margin-top: 10px;
+            color: var(--danger);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .verify-btn,
+        .cancel-btn {
+            height: 46px;
+            border: 0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 800;
+            padding: 0 18px;
+        }
+
+        .verify-btn {
+            flex: 1;
+            background: var(--danger);
+            color: #ffffff;
+        }
+
+        .verify-btn:hover {
+            background: var(--danger-dark);
+        }
+
+        .verify-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.65;
+        }
+
+        .cancel-btn {
+            background: #f1f2f6;
+            color: var(--text-main);
+        }
+
+        .success-toast {
+            position: fixed;
+            left: 50%;
+            bottom: 28px;
+            z-index: 120;
+            transform: translateX(-50%) translateY(20px);
+            background: #111827;
+            color: #ffffff;
+            padding: 13px 18px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 700;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.22s ease, transform 0.22s ease;
+        }
+
+        .success-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 900px) {
+            :root {
+                --header-height: 92px;
+            }
+
+            body {
+                overflow: hidden;
+            }
+
+            .header-inner,
+            .page {
+                width: min(680px, calc(100% - 32px));
+            }
+
+            .header-inner {
+                padding-top: 0;
+            }
+
+            .page {
+                padding-top: calc(var(--header-height) + 22px);
+            }
+
+            .scroll-body {
+                height: calc(100vh - var(--header-height) - 22px);
+            }
+
+            .cad-card {
+                grid-template-columns: 1fr;
+                gap: 24px;
+                padding: 18px;
+            }
+
+            .media-column,
+            .image-wrap {
+                width: 100%;
+                max-width: 420px;
+            }
+
+            .image-wrap {
+                height: auto;
+                aspect-ratio: 1 / 1;
+            }
+
+            .card-content {
+                max-width: 100%;
+                transform: none;
+            }
+        }
+
+        @media (max-width: 520px) {
+            :root {
+                --header-height: 128px;
+            }
+
+            .header-inner {
+                align-items: flex-start;
+                justify-content: center;
+                gap: 16px;
+                flex-direction: column;
+            }
+
+            .header-inner h1 {
+                font-size: 28px;
+            }
+
+            .otp-btn {
+                width: 100%;
+            }
+
+            .card-content h2 {
+                font-size: 18px;
+                margin-bottom: 12px;
+            }
+
+            .card-content p {
+                font-size: 14px;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .cancel-btn,
+            .verify-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="fixed-header">
+        <div class="header-inner">
+            <h1>CAD Block</h1>
+            <button id="otpActionBtn" class="otp-btn" type="button" onclick="handleOtpButton()">
+                Generate OTP
+            </button>
+        </div>
+    </header>
+
+    <main class="page">
+        <section class="scroll-body">
+            <div id="cadList" class="cad-list" aria-label="CAD block list"></div>
+        </section>
+    </main>
+
+    <div id="otpModal" class="modal-backdrop">
+        <div class="otp-modal" role="dialog" aria-modal="true" aria-labelledby="otpTitle">
+            <div class="modal-head">
+                <div>
+                    <h3 id="otpTitle">Verify OTP</h3>
+                    <p>
+                        Enter the OTP sent to your registered email address to unlock CAD file download.
+                    </p>
+                </div>
+
+                <button class="modal-close" type="button" onclick="closeOtpModal()">
+                    ×
+                </button>
+            </div>
+
+            <input
+                id="otpInput"
+                class="otp-input"
+                type="text"
+                inputmode="numeric"
+                maxlength="6"
+                placeholder="000000"
+                oninput="clearOtpError()"
+            />
+
+            <div id="otpError" class="modal-error"></div>
+
+            <div class="modal-actions">
+                <button class="cancel-btn" type="button" onclick="closeOtpModal()">
+                    Cancel
+                </button>
+
+                <button id="verifyOtpBtn" class="verify-btn" type="button" onclick="verifyOtp()">
+                    Verify OTP
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="successToast" class="success-toast">
+        OTP verified successfully. CAD download unlocked.
+    </div>
+
+    <script>
+
+        function getCadRequestId() {
+    const params = new URLSearchParams(window.location.search);
+
+    return params.get("documentId")
+}
+
+
+
+        const API_BASE_URL = "https://prod.clanleo.com/api";
+
+        // const documentId = getCadRequestId(); //|| "8452c326-b72b-4a63-a75f-d2a0bcef11e8";
+
+        let isOtpVerified = false;
+        let cadWebInfo = null;
+        let isLoading = false;
+        let cardImageIndexes = {};
+
+        document.addEventListener("DOMContentLoaded", function () {
+            fetchCadWebInfo();
+
+            const modal = document.getElementById("otpModal");
+
+            if (modal) {
+                modal.addEventListener("click", function (event) {
+                    if (event.target === this) {
+                        closeOtpModal();
+                    }
+                });
+            }
+
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape") {
+                    closeOtpModal();
+                }
+            });
+        });
+
+        // function getCadRequestId() {
+        //     const params = new URLSearchParams(window.location.search);
+
+        //     return (
+        //         params.get("id") ||
+        //         params.get("cadDownloadRequestId") ||
+        //         params.get("requestId") ||
+        //         documentId
+        //     );
+        // }
+
+        async function fetchCadWebInfo() {
+            const cadList = document.getElementById("cadList");
+            const actionBtn = document.getElementById("otpActionBtn");
+            const requestId = getCadRequestId();
+
+            setLoading(true);
+
+            cadList.innerHTML = `
+                <div class="loading-state">
+                    Loading CAD documents...
+                </div>
+            `;
+
+            try {
+                const response = await fetch(
+                    `${API_BASE_URL}/cad-documents/web-info/${requestId}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    }
+                );
+
+                const result = await response.json();
+
+                if (!response.ok || result.success === false) {
+                    throw new Error(result.message || "Failed to fetch CAD document details.");
+                }
+
+                cadWebInfo = result.data;
+
+                renderCadDocuments(cadWebInfo);
+                updateActionButtonByStatus(cadWebInfo?.currentStatus);
+            } catch (error) {
+                console.error("CAD web-info error:", error);
+
+                cadList.innerHTML = `
+                    <div class="error-state">
+                        ${escapeHtml(error.message || "Failed to load CAD documents.")}
+                    </div>
+                `;
+
+                actionBtn.disabled = true;
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function renderCadDocuments(data) {
+            const cadList = document.getElementById("cadList");
+            const documents = Array.isArray(data?.document) ? data.document : [];
+
+            cardImageIndexes = {};
+
+            if (documents.length === 0) {
+                cadList.innerHTML = `
+                    <div class="empty-state">
+                        No CAD documents found.
+                    </div>
+                `;
+                return;
+            }
+
+            cadList.innerHTML = documents
+                .map(function (doc, index) {
+                    const images = getDocumentImages(doc);
+                    const firstImage = images[0] || "";
+                    cardImageIndexes[index] = 0;
+
+                    return `
+                        <article class="cad-card" data-card-index="${index}">
+                            <div class="media-column">
+                                <div class="image-wrap">
+                                    ${
+                                        firstImage
+                                            ? `
+                                                <img
+                                                    id="mainImage-${index}"
+                                                    class="main-image"
+                                                    src="${escapeHtml(firstImage)}"
+                                                    alt="${escapeHtml(doc.title || "CAD Document")}"
+                                                    onerror="this.src='https://via.placeholder.com/600x600?text=CAD+Image'"
+                                                />
+                                            `
+                                            : `
+                                                <img
+                                                    id="mainImage-${index}"
+                                                    class="main-image"
+                                                    src="https://via.placeholder.com/600x600?text=CAD+Image"
+                                                    alt="CAD Image"
+                                                />
+                                            `
+                                    }
+
+                                    ${
+                                        images.length > 1
+                                            ? `
+                                                <button class="nav-arrow prev" type="button" onclick="changeImage(${index}, -1)">
+                                                    ‹
+                                                </button>
+
+                                                <button class="nav-arrow next" type="button" onclick="changeImage(${index}, 1)">
+                                                    ›
+                                                </button>
+
+                                                <div id="dots-${index}" class="dots">
+                                                    ${images
+                                                        .map(function (_, imgIndex) {
+                                                            return `
+                                                                <button
+                                                                    class="dot ${imgIndex === 0 ? "active" : ""}"
+                                                                    type="button"
+                                                                    onclick="setImage(${index}, ${imgIndex})">
+                                                                </button>
+                                                            `;
+                                                        })
+                                                        .join("")}
+                                                </div>
+                                            `
+                                            : ""
+                                    }
+                                </div>
+
+                                ${
+                                    images.length > 1
+                                        ? `
+                                            <div id="thumbs-${index}" class="thumb-list">
+                                                ${images
+                                                    .map(function (image, imgIndex) {
+                                                        return `
+                                                            <button
+                                                                class="thumb ${imgIndex === 0 ? "active" : ""}"
+                                                                type="button"
+                                                                onclick="setImage(${index}, ${imgIndex})">
+                                                                <img
+                                                                    src="${escapeHtml(image)}"
+                                                                    alt="CAD preview ${imgIndex + 1}"
+                                                                    onerror="this.src='https://via.placeholder.com/120x90?text=CAD'"
+                                                                />
+                                                            </button>
+                                                        `;
+                                                    })
+                                                    .join("")}
+                                            </div>
+                                        `
+                                        : ""
+                                }
+                            </div>
+
+                            <div class="card-content">
+                                <h2>${escapeHtml(doc.title || "Untitled CAD Document")}</h2>
+
+                                <p>
+                                    ${escapeHtml(doc.description || "No description available.")}
+                                </p>
+
+                                <div class="price-text">
+                                    $${escapeHtml(doc.price || "0")}
+                                </div>
+
+                                <div class="meta-box">
+                                    <div class="meta-row">
+                                        <strong>Email:</strong> ${escapeHtml(data?.cadReceiveEmail || "-")}
+                                    </div>
+
+                                    <div class="meta-row">
+                                        <strong>User:</strong> ${escapeHtml(getUserDisplayName(data?.user))}
+                                    </div>
+
+                                    <div class="meta-row">
+                                        <strong>Status:</strong> ${escapeHtml(data?.currentStatus || "-")}
+                                    </div>
+
+                                    <div class="meta-row">
+                                        <strong>Link Sent:</strong> ${escapeHtml(formatDateTime(data?.CadLinkSentAt))}
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    `;
+                })
+                .join("");
+        }
+
+        function getDocumentImages(doc) {
+            const images = [];
+
+            if (doc?.thumbnail) {
+                images.push(doc.thumbnail);
+            }
+
+            if (Array.isArray(doc?.cadMedias)) {
+                doc.cadMedias.forEach(function (media) {
+                    if (media?.mediaType === "IMAGE" && media?.mediaUrl) {
+                        images.push(media.mediaUrl);
+                    }
+
+                    if (media?.thumbnail) {
+                        images.push(media.thumbnail);
+                    }
+                });
+            }
+
+            return [...new Set(images)];
+        }
+
+        function getImagesByCardIndex(cardIndex) {
+            const documents = Array.isArray(cadWebInfo?.document) ? cadWebInfo.document : [];
+            const doc = documents[cardIndex];
+
+            if (!doc) {
+                return [];
+            }
+
+            return getDocumentImages(doc);
+        }
+
+        function changeImage(cardIndex, direction) {
+            const images = getImagesByCardIndex(cardIndex);
+
+            if (images.length === 0) {
+                return;
+            }
+
+            let currentIndex = cardImageIndexes[cardIndex] || 0;
+            currentIndex = currentIndex + direction;
+
+            if (currentIndex < 0) {
+                currentIndex = images.length - 1;
+            }
+
+            if (currentIndex >= images.length) {
+                currentIndex = 0;
+            }
+
+            setImage(cardIndex, currentIndex);
+        }
+
+        function setImage(cardIndex, imageIndex) {
+            const images = getImagesByCardIndex(cardIndex);
+
+            if (!images[imageIndex]) {
+                return;
+            }
+
+            cardImageIndexes[cardIndex] = imageIndex;
+
+            const mainImage = document.getElementById(`mainImage-${cardIndex}`);
+
+            if (mainImage) {
+                mainImage.src = images[imageIndex];
+            }
+
+            updateActiveItems(`dots-${cardIndex}`, "dot", imageIndex);
+            updateActiveItems(`thumbs-${cardIndex}`, "thumb", imageIndex);
+        }
+
+        function updateActiveItems(parentId, className, activeIndex) {
+            const parent = document.getElementById(parentId);
+
+            if (!parent) {
+                return;
+            }
+
+            const items = parent.querySelectorAll(`.${className}`);
+
+            items.forEach(function (item, index) {
+                item.classList.toggle("active", index === activeIndex);
+            });
+        }
+
+        function updateActionButtonByStatus(status) {
+            const actionBtn = document.getElementById("otpActionBtn");
+
+            if (!actionBtn) {
+                return;
+            }
+
+            actionBtn.disabled = false;
+
+            if (
+                status === "downloadLinkSent" ||
+                status === "otpVerified" ||
+                status === "refreshOtpVerified"
+            ) {
+                isOtpVerified = true;
+                actionBtn.textContent = "Download CAD Files";
+                actionBtn.classList.add("download-ready");
+            } else {
+                isOtpVerified = false;
+                actionBtn.textContent = "Generate OTP";
+                actionBtn.classList.remove("download-ready");
+            }
+        }
+
+        function handleOtpButton() {
+            if (isLoading) {
+                return;
+            }
+
+            if (isOtpVerified) {
+                downloadCadFiles();
+                return;
+            }
+
+            openOtpModal();
+        }
+
+        function openOtpModal() {
+            const modal = document.getElementById("otpModal");
+            const input = document.getElementById("otpInput");
+
+            if (!modal || !input) {
+                return;
+            }
+
+            modal.classList.add("show");
+            document.body.style.overflow = "hidden";
+
+            setTimeout(function () {
+                input.focus();
+            }, 120);
+        }
+
+        function closeOtpModal() {
+            const modal = document.getElementById("otpModal");
+
+            if (!modal) {
+                return;
+            }
+
+            modal.classList.remove("show");
+            document.body.style.overflow = "hidden";
+        }
+
+        function clearOtpError() {
+            const error = document.getElementById("otpError");
+
+            if (error) {
+                error.textContent = "";
+            }
+        }
+
+        async function verifyOtp() {
+            const input = document.getElementById("otpInput");
+            const error = document.getElementById("otpError");
+            const verifyBtn = document.getElementById("verifyOtpBtn");
+
+            const otp = input.value.trim();
+
+            if (!/^\d{4,6}$/.test(otp)) {
+                error.textContent = "Please enter a valid 4 to 6 digit OTP.";
+                input.focus();
+                return;
+            }
+
+            try {
+                verifyBtn.disabled = true;
+                verifyBtn.textContent = "Verifying...";
+                error.textContent = "";
+
+                const requestId = getCadRequestId();
+
+                /*
+                    Update this endpoint if your backend verify route is different.
+
+                    Expected body:
+                    {
+                        cadDownloadRequestId,
+                        otp,
+                        email
+                    }
+                */
+
+                const response = await fetch(
+                    `${API_BASE_URL}/cad-documents/verify-download-otp`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            cadDownloadRequestId: requestId,
+                            otp: otp,
+                            email: cadWebInfo?.cadReceiveEmail
+                        })
+                    }
+                );
+
+                const result = await response.json();
+
+                if (!response.ok || result.success === false) {
+                    throw new Error(result.message || "Invalid OTP.");
+                }
+
+                markOtpVerified();
+
+                await fetchCadWebInfo();
+            } catch (err) {
+                console.error("Verify OTP error:", err);
+                error.textContent = err.message || "Invalid OTP.";
+            } finally {
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = "Verify OTP";
+            }
+        }
+
+        function markOtpVerified() {
+            isOtpVerified = true;
+
+            const actionBtn = document.getElementById("otpActionBtn");
+            const input = document.getElementById("otpInput");
+
+            if (actionBtn) {
+                actionBtn.textContent = "Download CAD Files";
+                actionBtn.classList.add("download-ready");
+            }
+
+            if (input) {
+                input.value = "";
+            }
+
+            closeOtpModal();
+            showSuccessToast("OTP verified successfully. CAD download unlocked.");
+        }
+
+        function showSuccessToast(message) {
+            const toast = document.getElementById("successToast");
+
+            if (!toast) {
+                return;
+            }
+
+            toast.textContent = message || "Success";
+            toast.classList.add("show");
+
+            setTimeout(function () {
+                toast.classList.remove("show");
+            }, 2200);
+        }
+
+        function downloadCadFiles() {
+            const requestId = getCadRequestId();
+
+            /*
+                Update this download endpoint based on your backend.
+
+                Example backend route:
+                GET /api/cad-documents/download/:cadDownloadRequestId
+            */
+
+            window.location.href = `${API_BASE_URL}/cad-documents/download/${requestId}`;
+        }
+
+        function setLoading(value) {
+            isLoading = value;
+
+            const actionBtn = document.getElementById("otpActionBtn");
+
+            if (actionBtn) {
+                actionBtn.disabled = value;
+                actionBtn.textContent = value ? "Loading..." : actionBtn.textContent;
+            }
+        }
+
+        function getUserDisplayName(user) {
+            if (!user) {
+                return "-";
+            }
+
+            if (user.accountType === "COMPANY") {
+                return user.companyName || user.userName || user.email || "-";
+            }
+
+            return user.userName || user.companyName || user.email || "-";
+        }
+
+        function formatDateTime(value) {
+            if (!value) {
+                return "-";
+            }
+
+            const date = new Date(value);
+
+            if (Number.isNaN(date.getTime())) {
+                return "-";
+            }
+
+            return date.toLocaleString();
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+    </script>
+</body>
+</html>
