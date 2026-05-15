@@ -621,7 +621,8 @@
 
 
 
-        const API_BASE_URL = "https://prod.clanleo.com/api";
+        const API_BASE_URL ="http://192.168.29.80:3000/api";
+        // "https://prod.clanleo.com/api";
 
         // const documentId = getCadRequestId(); //|| "8452c326-b72b-4a63-a75f-d2a0bcef11e8";
 
@@ -650,16 +651,6 @@
             });
         });
 
-        // function getCadRequestId() {
-        //     const params = new URLSearchParams(window.location.search);
-
-        //     return (
-        //         params.get("id") ||
-        //         params.get("cadDownloadRequestId") ||
-        //         params.get("requestId") ||
-        //         documentId
-        //     );
-        // }
 
         async function fetchCadWebInfo() {
             const cadList = document.getElementById("cadList");
